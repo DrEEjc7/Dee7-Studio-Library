@@ -27,6 +27,8 @@ def main():
         json.dump(sitemap, f, indent=2)
 
     print(f"Generated sitemap.json with {len(sitemap)} pages.")
+    print("Sitemap content preview:")
+    print(json.dumps(sitemap[:5], indent=2))  # Print first 5 entries for verification
 
 if __name__ == "__main__":
     main()
