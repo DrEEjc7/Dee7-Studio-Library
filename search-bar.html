@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Webflow Search Bar</title>
+    <style>
+        .search-container {
+            display: flex;
+            align-items: center;
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 20px auto;
+        }
+        .search-label {
+            margin-right: 10px;
+            white-space: nowrap;
+        }
+        .search-input-container {
+            position: relative;
+            flex-grow: 1;
+        }
+        #search-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        #search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background-color: white;
+            border: 1px solid #ccc;
+            border-top: none;
+            border-radius: 0 0 4px 4px;
+            max-height: 200px;
+            overflow-y: auto;
+            display: none;
+        }
+        .search-result {
+            padding: 10px;
+            cursor: pointer;
+        }
+        .search-result:hover {
+            background-color: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+    <div class="search-container">
+        <span class="search-label">To Find Pages Start Typing:</span>
+        <div class="search-input-container">
+            <input type="text" id="search-input" placeholder="Search...">
+            <div id="search-results"></div>
+        </div>
+    </div>
+
+    <script>
+        let pages = [];
+
+        const searchInput = document.getElementById('search-input');
+        const searchResults = document.getElementById('search-results');
+
+        // Fetch pages from GitHub-hosted JSON file
+        fetch('https://raw.githubusercontent.com/DrEEjc7/Dee7-Studio-Library/main/sitemap.json')
+            .then(response => response.json())
+            .then(data => {
+                pages = data;
+                console.log(`Loaded ${pages.length} pages`);
+            })
+            .catch(error => console.error('Error loading pages:', error));
+
+        searchInput.addEventListener('input', function() {
+            const query = this.value.toLowerCase();
+            const filteredPages = pages.filter(page => 
+                page.title.toLowerCase().includes(query)
+            );
+
+            displayResults(filteredPages);
+        });
+
+        function displayResults(results) {
+            searchResults.innerHTML = '';
+            
+            if (results.length === 0 || searchInput.value.length === 0) {
+                searchResults.style.display = 'none';
+                return;
+            }
+
+            results.forEach(page => {
+                const div = document.createElement('div');
+                div.classList.add('search-result');
+                div.textContent = page.title;
+                div.addEventListener('click', () => {
+                    window.location.href = page.url;
+                });
+                searchResults.appendChild(div);
+            });
+
+            searchResults.style.display = 'block';
+        }
+
+        // Close results when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!searchResults.contains(event.target) && event.target !== searchInput) {
+                searchResults.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
